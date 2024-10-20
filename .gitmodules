@@ -1,0 +1,3 @@
+[submodule "src/i2c_pwm_board"]
+	path = src/i2c_pwm_board
+	url = https://github.com/eborghi10/i2c_pwm_board
