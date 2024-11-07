@@ -20,9 +20,12 @@ def subscriberMethod():
     rospy.spin()
 
 if __name__ == '__main__':
-    kit = ServoKit(channels=16)
+    kit = ServoKit(channels=16)  
     m = 0
-    for i in range(4):
-    	kit.servo[i].angle = 0
+    for i in range(6):
+    	kit.servo[0].actuation_range = 180
+    	kit.servo[0].set_pulse_width_range(600, 2600)
     	m=m+1
+    
+    kit.servo[2].angle = 90
     subscriberMethod()                        

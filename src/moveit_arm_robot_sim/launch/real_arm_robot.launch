@@ -1,9 +1,6 @@
 <launch>
   
   <arg name="use_gui" default="false" />
-  <include file="$(find moveit_arm_robot_sim)/launch/planning_context.launch">
-    <arg name="load_robot_description" value="true"/>
-  </include>
   
   <!-- If needed, broadcast static tf for robot root -->
   <node name="tf_footprint_base" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link base_footprint 40" />
@@ -12,15 +9,17 @@
     <param name="use_gui" value="$(arg use_gui)"/>
     <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
   </node>
-  
-  
   <!-- Robot State Publisher for TF of each joint: publishes all the current states of the joint, then RViz can visualize -->	
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
   
   <!-- Launch Moveit Move Group Node -->
   <include file = "$(find moveit_arm_robot_sim)/launch/move_group.launch">
+    <arg name="load_robot_description" default="true" />
     <arg name="moveit_controller_manager" value="fake" />
   </include>
+  
+  <rosparam file="$(find moveit_arm_robot_sim)/config/ros_controllers.yaml" />
+  <node name= "controller_spawner" pkg= "controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller robot_arm_controller hand_ee_controller"/>
   
   <!-- Run Rviz and load the default configuration to see the state of the move_group node -->
   <arg name="use_rviz" default="true" />
@@ -29,4 +28,5 @@
     <arg name="rviz_config" value="$(find moveit_arm_robot_sim)/launch/moveit.rviz"/>
     <arg name="debug" value="false"/>
   </include>
+  <node name="rqt_reconfigure" pkg="rqt_gui" type="rqt_gui" />
 </launch>

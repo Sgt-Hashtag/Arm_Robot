@@ -6,6 +6,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/arm_robot_urdf.srdf
   CONFIG:
-    author_name: ADas
-    author_email: abhirup.das@rwth-aachen.de
-    generated_timestamp: 1726595111
+    author_name: Adas
+    author_email: abhirup_das@rwth-aachen.de
+    generated_timestamp: 1730191058

@@ -194,9 +194,7 @@ arm_group:
     - AITstar
     - ABITstar
     - BITstar
-  projection_evaluator: joints(joint1,joint2)
-  longest_valid_segment_fraction: 0.005
-gripper_group:
+gripper:
   planner_configs:
     - AnytimePathShortening
     - SBL
