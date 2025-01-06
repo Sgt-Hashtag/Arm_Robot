@@ -30,6 +30,10 @@
         <joint name="joint6" value="1.0472"/>
         <joint name="joint7" value="-1.0471"/>
     </group_state>
+    <group_state name="gripper_close" group="gripper">
+        <joint name="joint6" value="0.52"/>
+        <joint name="joint7" value="-0.52"/>
+    </group_state>
     <group_state name="arm_zero" group="arm_group">
         <joint name="joint1" value="0"/>
         <joint name="joint2" value="0"/>

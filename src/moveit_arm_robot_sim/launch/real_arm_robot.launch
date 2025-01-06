@@ -28,5 +28,5 @@
     <arg name="rviz_config" value="$(find moveit_arm_robot_sim)/launch/moveit.rviz"/>
     <arg name="debug" value="false"/>
   </include>
-  <node name="rqt_reconfigure" pkg="rqt_gui" type="rqt_gui" />
+  <node name="pause_resume_service_node" pkg="moveit_arm_robot_sim" type="pause_resume_service.py" output="screen">  </node>
 </launch>

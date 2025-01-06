@@ -1,0 +1,1 @@
+/home/Arm_20/Desktop/Robot_arm/devel/./cmake.lock 184

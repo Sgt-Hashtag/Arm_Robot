@@ -1,0 +1,32 @@
+<launch>
+  
+  <arg name="use_gui" default="false" />
+  
+  <!-- If needed, broadcast static tf for robot root -->
+  <node name="tf_footprint_base" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link base_footprint 40" />
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="$(arg use_gui)"/>
+    <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+  </node>
+  <!-- Robot State Publisher for TF of each joint: publishes all the current states of the joint, then RViz can visualize -->	
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+  
+  <!-- Launch Moveit Move Group Node -->
+  <include file = "$(find arm_robot_moveit)/launch/move_group.launch">
+    <arg name="load_robot_description" default="true" />
+    <arg name="moveit_controller_manager" value="fake" />
+  </include>
+  
+  <rosparam file="$(find arm_robot_moveit)/config/ros_controllers.yaml" />
+  <node name= "controller_spawner" pkg= "controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_robot hand_ee"/>
+  
+  <!-- Run Rviz and load the default configuration to see the state of the move_group node -->
+  <arg name="use_rviz" default="true" />
+  
+  <include file="$(find arm_robot_moveit)/launch/moveit_rviz.launch" if="$(arg use_rviz)">
+    <arg name="rviz_config" value="$(find arm_robot_moveit)/launch/moveit.rviz"/>
+    <arg name="debug" value="false"/>
+  </include>
+  <node name="pause_resume_service_node" pkg="arm_robot_moveit" type="pause_resume_service.py" output="screen">  </node>
+</launch>

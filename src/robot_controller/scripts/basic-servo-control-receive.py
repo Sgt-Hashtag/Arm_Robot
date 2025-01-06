@@ -26,6 +26,8 @@ if __name__ == '__main__':
     	kit.servo[0].actuation_range = 180
     	kit.servo[0].set_pulse_width_range(600, 2600)
     	m=m+1
-    
+    kit.servo[0].angle = 0
+    kit.servo[1].angle = 90
     kit.servo[2].angle = 90
+    kit.servo[3].angle = 90
     subscriberMethod()                        

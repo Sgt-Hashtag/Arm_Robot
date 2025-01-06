@@ -1,0 +1,60 @@
+hand_ee:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint5
+    - joint6
+  gains:
+    joint5:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint6:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+arm_robot:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+  goal_tolerance:
+      joint1: 0.001
+      joint2: 0.001
+      joint3: 0.001 
+      joint4: 0.001
+  gains:
+    joint1:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint2:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint3:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint4:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+
+# Controller to continuously publish joint states/positions
+joint_state_controller:
+  type: "joint_state_controller/JointStateController"
+  publish_rate: 50
+      
+initial:  # Define initial robot poses per group
+  - group: hand_ee
+    pose: hand_zero
+  - group: arm_robot
+    pose: arm_home

@@ -3,8 +3,9 @@
 import rospy
 import sys
 import math
+import actionlib
 import moveit_commander
-from moveit_msgs.msg import CollisionObject
+from moveit_msgs.msg import CollisionObject, ExecuteTrajectoryAction, ExecuteTrajectoryGoal
 import geometry_msgs.msg
 from shape_msgs.msg import SolidPrimitive
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -34,14 +35,20 @@ class ArmRobot:
 		
 		#Instantiate MoveGroupCommander Object	
 		self._group = moveit_commander.MoveGroupCommander(self._planning_group)
+		self._eef_group = moveit_commander.MoveGroupCommander(self._grasping_group)
 		
 		#Get the planning frame, end effector link and the robot group names
 		self._planning_frame = self._group.get_planning_frame()
 		self._eef_link = self._group.get_end_effector_link()
 		self._group_names = self._robot.get_group_names()
+		self._group.set_goal_position_tolerance(1E-2)
+		self._group.set_goal_orientation_tolerance(1E-3)
+		self._group.set_planning_time(10) #setting planning time in seconds
+		self._group.set_planner_id("RRTConnectkConfigDefault")
 		
 		self.box_name = ""
-
+		self._execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', ExecuteTrajectoryAction)
+		self._execute_trajectory_client.wait_for_server()
 		#print the info
 		#here the '\033[95m' represents the standard colour "LightMagenta" in terminals. For details, refer: https://pkg.go.dev/github.com/whitedevops/colors
 		#The '\033[0m' is added at the end of string to reset the terminal colours to default
@@ -89,20 +96,20 @@ class ArmRobot:
 		## First, create an message object of type pose to deifne box positions
 		object_pose = geometry_msgs.msg.Pose()
 		#box_pose.header.frame_id=self._armrobot.get_planning_frame()
-		object_pose.header.frame_id = ref_frame
+		#object_pose.header.frame_id = ref_frame
 
 		#set the position massage arguments
-		object_pose.pose.position.x = pose[0]
-		object_pose.pose.position.y = pose[1]
-		object_pose.pose.position.z = pose[2]
+		object_pose.position.x = pose[0]
+		object_pose.position.y = pose[1]
+		object_pose.position.z = pose[2]
 		
 		#creating quaternion from (rpy)
 		orientation_ = quaternion_from_euler(pose[3], pose[4], pose[5])
 		
-		object_pose.pose.orientation.x = orientation_[0]
-		object_pose.pose.orientation.y = orientation_[1]
-		object_pose.pose.orientation.x = orientation_[2]
-		object_pose.pose.orientation.w = orientation_[3]
+		object_pose.orientation.x = orientation_[0]
+		object_pose.orientation.y = orientation_[1]
+		object_pose.orientation.x = orientation_[2]
+		object_pose.orientation.w = orientation_[3]
 
 		#Adding Object 
 		object.primitive_poses = [object_pose] 
@@ -112,7 +119,7 @@ class ArmRobot:
 		#https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
 		#https://docs.ros.org/en/noetic/api/moveit_commander/html/planning__scene__interface_8py_source.html
 		#Check if the box is added sucessfully
-		return self.wait_for_state_update(obj_id, box_is_known=True, timeout=timeout)
+		return self.wait_for_state_update(obj_id, obj_is_known=True, timeout=timeout)
 		
 		
 	# def attach_box(self,name, timeout=4):
@@ -151,7 +158,7 @@ class ArmRobot:
 	# 	return self.wait_for_state_update(name, box_is_known=False, box_is_attached=False,  timeout=timeout)
 	
 
-	def gripper_action(gripper, action="open"):
+	def gripper_action(self,gripper, action="open"):
 		'''
 		Function to execute the required action of the gripper.
 
@@ -166,13 +173,21 @@ class ArmRobot:
 		print("Executing gripper action = ", action)
 
 		if(action == "open"):
-			gripper.move(gripper.max_bound(), True)
+			self.set_pose(gripper,"gripper_open")
 		elif(action == "close"):
-			gripper.move(gripper.max_bound()*0.5, True)
+			self.set_pose(gripper,"gripper_close")
 		else:
 			print("Action undefined") 
-
-	def move_to_pose(arm, goal_pose):
+	def set_pose(self,eef,arg_pose_name):
+		eef.set_named_target(arg_pose_name)
+		plan_success, plan, planning_time, error_code = eef.plan()
+		goal=ExecuteTrajectoryGoal()
+		goal.trajectory = plan
+		self._execute_trajectory_client.send_goal(goal)
+		self._execute_trajectory_client.wait_for_result()
+		rospy.loginfo('\033[32m' + "Now at: {}".format(arg_pose_name) + '\033[0m')
+		
+	def move_to_pose(self,arm, goal_pose):
 		'''
 		Function to move the robot arm to the requested pose
 
@@ -185,14 +200,10 @@ class ArmRobot:
 			None
 		'''
 		#NOTE:
-		#The planner will create a plan for the panda_link8 to reach
-		#the goal pose. But since we have an end-endeffector attached to it
-		#it will cause collision.
+		#The planner will create a plan for the robot to reach
+		#the goal pose. 
 
-		#distance between wrist(panda_link8) and gripper_end(panda_hand_tcp)
-		wrist_to_tcp = 0.103
-
-		# rospy.logwarn("planning and moving to location")
+		rospy.logwarn("planning and moving to location")
 		gripper_angle = geometry_msgs.msg.Quaternion()
 
 		#Orientation of the tcp(panda_hand_tcp) w.r.t base frame(panda_link0) 
@@ -207,8 +218,7 @@ class ArmRobot:
 		grasp_pose = geometry_msgs.msg.Pose()
 		grasp_pose.position.x = goal_pose.position.x
 		grasp_pose.position.y = goal_pose.position.y
-		#adding tcp distance because the planning frame is panda_link8
-		grasp_pose.position.z = goal_pose.position.z + wrist_to_tcp  
+		grasp_pose.position.z = goal_pose.position.z   
 		grasp_pose.orientation = gripper_angle
 
 		print("Exectuting move_to_pose ({} , {},  {})"
@@ -224,7 +234,7 @@ class ArmRobot:
 
 	def pick_action(self,scene, robot, arm, gripper, pick_pose, box):
 		# Gripper open
-		gripper_action(gripper, action="open")
+		self.gripper_action(gripper, action="open")
 		# Sleep
 		rospy.sleep(1)
 
@@ -235,18 +245,18 @@ class ArmRobot:
 		pre_pick_pose.position.y = pick_pose.position.y
 		pre_pick_pose.position.z = pick_pose.position.z + 0.1 # Placing it above the object
 		# Move
-		move_to_pose(arm, pre_pick_pose)
+		self.move_to_pose(arm, pre_pick_pose)
 		# Sleep
 		rospy.sleep(1)
 
 		# 2) Move to pick location
-		move_to_pose(arm, pick_pose)
+		self.move_to_pose(arm, pick_pose)
 		# Sleep
 		rospy.sleep(1)
 
 		# 3) Close the gripper and attach the object
 		# Close gripper
-		gripper_action(gripper, action="close")
+		self.gripper_action(gripper, action="close")
 		# Attaching the object
 		eef_frame = arm.get_end_effector_link()
 		grasping_group = self._grasping_group
@@ -263,13 +273,13 @@ class ArmRobot:
 		post_pick_pose.position.y = pick_pose.position.y
 		post_pick_pose.position.z = pick_pose.position.z + 0.1
 		# Move
-		move_to_pose(arm, post_pick_pose)
+		self.move_to_pose(arm, post_pick_pose)
 		# Sleep
 		rospy.sleep(1)
 		return None        
 	
 	# Object Place function
-	def place_action(scene, arm, gripper, place_pose, box):
+	def place_action(self, scene, arm, gripper, place_pose, box):
 		# 1) Move to pre-drop location
 		# Define pre-drop pose
 		pre_drop_pose = geometry_msgs.msg.Pose()
@@ -277,18 +287,18 @@ class ArmRobot:
 		pre_drop_pose.position.y = place_pose.position.y
 		pre_drop_pose.position.z = place_pose.position.z + 0.001
 		# Move
-		move_to_pose(arm, pre_drop_pose)
+		self.move_to_pose(arm, pre_drop_pose)
 		# Sleep
 		rospy.sleep(1)
 
 		# 2) Move to drop location
-		move_to_pose(arm, place_pose)
+		self.move_to_pose(arm, place_pose)
 		# Sleep
 		rospy.sleep(1)
 
 		# 3) Open the gripper and detach the object
 		# Open gripper
-		gripper_action(gripper, action="open")
+		self.gripper_action(gripper, action="open")
 		# Detaching the object
 		eef_frame = arm.get_end_effector_link()
 		scene.remove_attached_object(eef_frame, name=box)
@@ -302,7 +312,7 @@ class ArmRobot:
 		post_drop_pose.position.y = place_pose.position.y
 		post_drop_pose.position.z = place_pose.position.z + 0.1
 		# Move
-		move_to_pose(arm, post_drop_pose)
+		self.move_to_pose(arm, post_drop_pose)
 		# Sleep
 		rospy.sleep(1)
 		return None
@@ -321,20 +331,20 @@ def main():
 	rospy.loginfo("-- Adding Objects --")
 	robotArm.create_object(obj_id="table1", ref_frame=robotArm._planning_frame,pose=[0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
 	robotArm.create_object(obj_id="table2", ref_frame=robotArm._planning_frame,pose=[-0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
-	robotArm.add_box(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2,0,0.0,0.0,0.0,0.0],dims=[0.05,0.05,0.05])
+	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2,0,0.025,0.0,0.0,0.0],dims=[0.05,0.05,0.05])
 	#robotArm.add_box("package$2",0.00,0.6318,0.015,0.03,0.03,0.03)
 	rospy.loginfo("Picking object 1")
 	pick_pose_1 = geometry_msgs.msg.Pose()
 	pick_pose_1.position.x = 0.5
 	pick_pose_1.position.y = -0.1
 	pick_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2.0)
-	pick_action(robotArm._scene, robotArm._commander, robotArm._group, gripper, pick_pose_1, box="box1")
+	robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group, pick_pose_1, box="box1")
 	# Place box1
 	place_pose_1 = geometry_msgs.msg.Pose()
 	place_pose_1.position.x = -0.15
 	place_pose_1.position.y = 0.5
 	place_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2)
-	place_action(robotArm._scene, robotArm._group, gripper, place_pose_1, box="box1")
+	robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, place_pose_1, box="box1")
 	# while not rospy.is_shutdown():
 	# 	task = input("Enter add to add object, attch to attach object, detach to detach object and remove to remove object: ")            
 	# 	if task == "attach":
@@ -355,6 +365,7 @@ def main():
 	# quit()
 	#delete the robotArm object at the end of code
 	# del robotArm
+	robotArm._scene.remove_world_object()
     
 if __name__ == '__main__':
     main()      

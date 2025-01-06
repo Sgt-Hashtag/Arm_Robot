@@ -1,0 +1,11 @@
+arm_robot:
+  type: "position_controllers/JointTrajectoryController"
+  joints: [joint1, joint2, joint3, joint4]
+
+hand_ee:
+  type: "position_controllers/JointTrajectoryController"
+  joints: [joint5, joint6]
+
+joint_state_controller:
+  type: "joint_state_controller/JointStateController"
+  publish_rate: 50

@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: arm_robot
+    relative_path: urdf/arm_robot.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/arm_robot.srdf
+  CONFIG:
+    author_name: Abhirup Das
+    author_email: abhirup.das@rwth-aachen.de
+    generated_timestamp: 1735925000
