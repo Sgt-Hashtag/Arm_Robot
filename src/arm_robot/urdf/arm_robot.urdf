@@ -398,13 +398,77 @@
       effort="1"
       velocity="3" />
   </joint>
-  <link name="gripper_center"/>
-  <joint name="gripper_center_joint" type="fixed">
+  <!-- Virtual roll joint -->
+  <joint name="virtual_roll_joint" type="revolute">
+    <limit lower="-3.1415" upper="3.1415" effort="54.0" velocity="3.14"/>
     <parent link="link4"/>
+    <child link="virtual_roll_link"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="0.2056 0.0 0.0" rpy="0 0 0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+  <!-- Virtual roll link -->
+  <link name="virtual_roll_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+     </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="1.0e-03" />
+      <inertia ixx="1.0e-03" ixy="0.0" ixz="0.0"
+               iyy="1.0e-03" iyz="0.0"
+               izz="1.0e-03" />
+    </inertial>
+  </link>
+
+  <gazebo reference="virtual_roll_link">
+  </gazebo>
+
+  <!-- Virtual yaw joint -->
+  <joint name="virtual_yaw_joint" type="revolute">
+    <limit lower="-3.1415" upper="3.1415" effort="54.0" velocity="3.14"/>
+    <parent link="virtual_roll_link"/>
+    <child link="virtual_yaw_link"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+  <!-- Virtual yaw link -->
+  <link name="virtual_yaw_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+     </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="1.0e-03" />
+      <inertia ixx="1.0e-03" ixy="0.0" ixz="0.0"
+               iyy="1.0e-03" iyz="0.0"
+               izz="1.0e-03" />
+    </inertial>
+  </link>
+  <gazebo reference="virtual_yaw_link">
+  </gazebo>
+  
+  <!-- end effector joint -->
+  <link name="gripper_center">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+     </visual>
+  </link>
+  <joint name="gripper_center_joint" type="fixed">
+    <parent link="virtual_yaw_link"/>
     <child link="gripper_center"/>
-    <!-- <origin xyz="0 -0.017 0.1" rpy="0 0 0"/> -->
-    <origin xyz="0.095613 0.0 -0.00035" rpy="1.5708 1.5708 0" />
-    <axis xyz="0 0 0"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </joint>
 
   <transmission name="link1_trans">
@@ -463,6 +527,26 @@
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="link6_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="virtual_roll_joint_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="virtual_roll_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="virtual_roll_joint_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="virtual_yaw_joint_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="virtual_yaw_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="virtual_yaw_joint_motor">
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>

@@ -118,25 +118,25 @@ Visualization Manager:
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         base_link:
-          Value: true
+          Value: false
         gripper_center:
           Value: true
         link1:
-          Value: true
+          Value: false
         link2:
-          Value: true
+          Value: false
         link3:
-          Value: true
+          Value: false
         link4:
           Value: true
         link5:
-          Value: true
+          Value: false
         link6:
-          Value: true
+          Value: false
         world:
-          Value: true
+          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -207,7 +207,7 @@ Visualization Manager:
       Yaw: 3.0803983211517334
     Saved:
       - Class: rviz/Orbit
-        Distance: 1.167883038520813
+        Distance: 0.445334255695343
         Enable Stereo Rendering:
           Stereo Eye Separation: 0.05999999865889549
           Stereo Focal Distance: 1
@@ -223,9 +223,9 @@ Visualization Manager:
         Invert Z Axis: false
         Name: Orbit
         Near Clip Distance: 0.009999999776482582
-        Pitch: 0.13539831340312958
+        Pitch: 0.36039838194847107
         Target Frame: <Fixed Frame>
-        Yaw: 2.9553985595703125
+        Yaw: 3.0803983211517334
 Window Geometry:
   Displays:
     collapsed: false
@@ -242,5 +242,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 72
+  X: 60
   Y: 27

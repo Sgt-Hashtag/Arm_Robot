@@ -6,6 +6,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/arm_robot.srdf
   CONFIG:
-    author_name: Abhirup Das
-    author_email: abhirup.das@rwth-aachen.de
-    generated_timestamp: 1735925000
+    author_name: A Das
+    author_email: abhirup.das1000@gmail.com
+    generated_timestamp: 1736850503

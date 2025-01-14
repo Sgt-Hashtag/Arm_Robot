@@ -44,7 +44,7 @@ class ArmRobot:
 		self._group.set_goal_position_tolerance(1E-2)
 		self._group.set_goal_orientation_tolerance(1E-3)
 		self._group.set_planning_time(10) #setting planning time in seconds
-		self._group.set_planner_id("RRTConnectkConfigDefault")
+		self._group.set_planner_id("RRT")
 		
 		self.box_name = ""
 		self._execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', ExecuteTrajectoryAction)
@@ -173,9 +173,9 @@ class ArmRobot:
 		print("Executing gripper action = ", action)
 
 		if(action == "open"):
-			self.set_pose(gripper,"hand_open")
+			self.set_pose(gripper,"gripper_open")
 		elif(action == "close"):
-			self.set_pose(gripper,"hand_close")
+			self.set_pose(gripper,"gripper_close")
 		else:
 			print("Action undefined") 
 	def set_pose(self,eef,arg_pose_name):
@@ -326,12 +326,12 @@ def main():
 	#Initialize a ROS Node
 	rospy.init_node('add_attach_detach_objects_in_Rviz', anonymous=True)
 
-	robotArm = ArmRobot("arm_robot", "hand_ee")
+	robotArm = ArmRobot("arm_group", "gripper_group")
 	robotArm._scene.remove_world_object()
 	rospy.loginfo("-- Adding Objects --")
 	robotArm.create_object(obj_id="table1", ref_frame=robotArm._planning_frame,pose=[0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
 	robotArm.create_object(obj_id="table2", ref_frame=robotArm._planning_frame,pose=[-0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
-	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2,0,0.025,0.0,0.0,0.0],dims=[0.05,0.05,0.05])
+	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2,0,0.025,0.0,0.0,0.0],dims=[0.04,0.04,0.04])
 	#robotArm.add_box("package$2",0.00,0.6318,0.015,0.03,0.03,0.03)
 	rospy.loginfo("Picking object 1")
 	pick_pose_1 = geometry_msgs.msg.Pose()

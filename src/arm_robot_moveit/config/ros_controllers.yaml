@@ -1,60 +1,64 @@
-hand_ee:
-  type: position_controllers/JointTrajectoryController
-  joints:
-    - joint5
-    - joint6
-  gains:
-    joint5:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    joint6:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-arm_robot:
-  type: position_controllers/JointTrajectoryController
+moveit_sim_hw_interface:
+  joint_model_group: arm_group
+  joint_model_group_pose: arm_home
+# Settings for ros_control_boilerplate control loop
+generic_hw_control_loop:
+  loop_hz: 300
+  cycle_time_error_threshold: 0.01
+# Settings for ros_control hardware interface
+hardware_interface:
   joints:
     - joint1
     - joint2
     - joint3
     - joint4
-  goal_tolerance:
-      joint1: 0.001
-      joint2: 0.001
-      joint3: 0.001 
-      joint4: 0.001
-  gains:
-    joint1:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    joint2:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    joint3:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    joint4:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
+    - gripper
+    - virtual_roll_joint
+    - virtual_yaw_joint
+  sim_control_mode: 1  # 0: position, 1: velocity
 
-# Controller to continuously publish joint states/positions
+
 joint_state_controller:
-  type: "joint_state_controller/JointStateController"
+  type: joint_state_controller/JointStateController
   publish_rate: 50
-      
-initial:  # Define initial robot poses per group
-  - group: hand_ee
-    pose: hand_zero
-  - group: arm_robot
-    pose: arm_home
+controller_list:
+  - name: arm_group_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - virtual_roll_joint
+      - virtual_yaw_joint
+    gains:
+      joint1:
+        p: 100.0
+        i: 0.0
+        d: 10.0
+        i_clamp: 1.0  # Optional: limit for integral term
+      joint2:
+        p: 100.0
+        i: 0.0
+        d: 10.0
+        i_clamp: 1.0
+      joint3:
+        p: 100.0
+        i: 0.0
+        d: 10.0
+        i_clamp: 1.0
+      joint4:
+        p: 100.0
+        i: 0.0
+        d: 10.0
+        i_clamp: 1.0
+
+  - name: hand_ee_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - joint5
+      - joint6

@@ -3,10 +3,11 @@
   <name>arm_robot_moveit</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the arm_robot with the MoveIt Motion Planning Framework
+    An automatically generated package with all the configuration and launch files for using the
+    arm_robot with the MoveIt Motion Planning Framework
   </description>
-  <author email="abhirup.das@rwth-aachen.de">Abhirup Das</author>
-  <maintainer email="abhirup.das@rwth-aachen.de">Abhirup Das</maintainer>
+  <author email="abhirup.das@rwth-aachen.de">A Das</author>
+  <maintainer email="abhirup.das@rwth-aachen.de">A Das</maintainer>
 
   <license>BSD</license>
 
@@ -15,6 +16,15 @@
   <url type="repository">https://github.com/moveit/moveit</url>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+
 
   <run_depend>moveit_ros_move_group</run_depend>
   <run_depend>moveit_fake_controller_manager</run_depend>
@@ -33,7 +43,8 @@
        We don't include them by default to prevent installing gazebo and all its dependencies. -->
   <!-- <run_depend>joint_trajectory_controller</run_depend> -->
   <!-- <run_depend>gazebo_ros_control</run_depend> -->
-  <!-- This package is referenced in the warehouse launch files, but does not build out of the box at the moment. Commented the dependency until this works. -->
+  <!-- This package is referenced in the warehouse launch files, but does not build out of the box
+  at the moment. Commented the dependency until this works. -->
   <!-- <run_depend>warehouse_ros_mongo</run_depend> -->
   <run_depend>arm_robot</run_depend>
 

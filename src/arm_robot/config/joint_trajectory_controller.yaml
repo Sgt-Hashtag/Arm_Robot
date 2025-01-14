@@ -1,8 +1,8 @@
-arm_robot:
+arm_group_controller:
   type: "position_controllers/JointTrajectoryController"
-  joints: [joint1, joint2, joint3, joint4]
+  joints: [joint1, joint2, joint3, joint4, virtual_roll_joint, virtual_yaw_joint]
 
-hand_ee:
+hand_ee_controller:
   type: "position_controllers/JointTrajectoryController"
   joints: [joint5, joint6]
 

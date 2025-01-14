@@ -23,9 +23,9 @@ def callback(data):
         if index>1 and index<4 :
             radians_to_angles = 90 + radians_to_angles
         if index==5:
-            radians_to_angles = 180 - radians_to_angles  
+            radians_to_angles = 180 + radians_to_angles  
         
-        data_list.append(radians_to_angles)
+        data_list.append(round(radians_to_angles,1))
         
     rospy.loginfo(rospy.get_caller_id() + "%s", data_list)
     # mc.send_angles(data_list, 25)
@@ -66,9 +66,9 @@ if __name__ == "__main__":
     kit.servo[6].set_pulse_width_range(600, 2600)
    
     kit.servo[0].angle = 0
-    kit.servo[1].angle = 90
-    kit.servo[2].angle = 90
-    kit.servo[3].angle = 90
-    kit.servo[4].angle = 90    
-    kit.servo[5].angle = 180 
+    kit.servo[1].angle = 135.0
+    kit.servo[2].angle = 179.9
+    kit.servo[3].angle = 135.0
+    kit.servo[4].angle = 22.5    
+    kit.servo[5].angle = 157.5
     listener()

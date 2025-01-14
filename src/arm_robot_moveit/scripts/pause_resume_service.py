@@ -21,7 +21,7 @@ def main():
 
     # Initialize the MoveGroupCommander for the robot's planning group (e.g., 'arm')
     global move_group
-    move_group = MoveGroupCommander("arm_robot")
+    move_group = MoveGroupCommander("arm_group")
 
     # Define the custom services for pausing and resuming execution
     pause_service = rospy.Service('/pause_execution', SetBool, pause_execution)

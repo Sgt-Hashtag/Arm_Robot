@@ -1,0 +1,42 @@
+# Ignore build directory
+/build/
+
+# Ignore devel directory (development space)
+/devel/
+
+# Ignore install directory
+/install/
+
+# Ignore catkin config files
+*.catkin
+
+# Ignore log files
+*.log
+*.catkin_tools/
+
+# Ignore CMake generated files
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Ignore editor files (optional, if you use specific editors)
+# For VS Code
+.vscode/
+
+# For Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# For Mac OS specific files (optional)
+.DS_Store
+
+# Ignore Python bytecode
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore ROS-related temp files
+*.bak
+*.swp
+
