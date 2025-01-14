@@ -1,5 +1,5 @@
 controller_list:
-  - name: robot_arm_controller
+  - name: arm_group_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
@@ -11,7 +11,7 @@ controller_list:
     - virtual_roll_joint
     - virtual_yaw_joint
   
-  - name: hand_ee_controller
+  - name: gripper_group_controller
     action_ns: follow_joint_trajectory
     default: True
     type: FollowJointTrajectory

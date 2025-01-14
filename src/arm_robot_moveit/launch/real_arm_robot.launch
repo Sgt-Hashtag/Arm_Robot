@@ -14,7 +14,7 @@
   then RViz can visualize -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
     respawn="false" output="screen" />
-
+  <include file="$(find arm_robot_moveit)/launch/fake_moveit_controller_manager.launch.xml" />
   <!-- Launch Moveit Move Group Node -->
   <include file="$(find arm_robot_moveit)/launch/move_group.launch">
     <arg name="load_robot_description" default="true" />
@@ -22,8 +22,8 @@
   </include>
 
   <rosparam file="$(find arm_robot_moveit)/config/ros_controllers.yaml" />
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="joint_state_controller robot_arm_controller hand_ee_controller" />
+  <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" args="joint_state_controller arm_group_controller gripper_group_controller" /> -->
 
   <!-- Run Rviz and load the default configuration to see the state of the move_group node -->
   <arg name="use_rviz" default="true" />

@@ -25,7 +25,7 @@
 	and launch the joint trajectory controller-->
 	<rosparam file="$(find arm_robot)/config/joint_trajectory_controller.yaml" command="load" />
 	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-		output="screen" args="joint_state_controller arm_group_controller hand_ee_controller" />
+		output="screen" args="joint_state_controller arm_group_controller gripper_group_controller" />
 	<!-- Robot State Publisher for TF of each joint: publishes all the current states of the joint,
 	then RViz can visualize -->
 

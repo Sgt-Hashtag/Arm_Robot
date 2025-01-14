@@ -12,6 +12,7 @@
 
 # Ignore log files
 *.log
+/logs/
 *.catkin_tools/
 
 # Ignore CMake generated files
