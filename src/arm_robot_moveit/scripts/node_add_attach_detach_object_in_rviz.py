@@ -44,9 +44,7 @@ class ArmRobot:
 		self._group.set_goal_position_tolerance(1E-2)
 		self._group.set_goal_orientation_tolerance(1E-3)
 		self._group.set_planning_time(10) #setting planning time in seconds
-		self._group.set_planner_id("RRT")
-		
-		self.box_name = ""
+	
 		self._execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', ExecuteTrajectoryAction)
 		self._execute_trajectory_client.wait_for_server()
 		#print the info
@@ -120,44 +118,7 @@ class ArmRobot:
 		#https://docs.ros.org/en/noetic/api/moveit_commander/html/planning__scene__interface_8py_source.html
 		#Check if the box is added sucessfully
 		return self.wait_for_state_update(obj_id, obj_is_known=True, timeout=timeout)
-		
-		
-	# def attach_box(self,name, timeout=4):
-	# 	box_name = name
-	# 	robot = self._robot
-	# 	scene = self._scene
-	# 	eef_link = self._eef_link
-
-	# 	grasping_group = self._grasping_group
-	# 	touch_links = robot.get_link_names(group=grasping_group)
-	# 	rospy.loginfo('\033[95m' + "Touch Link: {}".format(touch_links) + '\033[0m')
-	# 	scene.attach_box(eef_link, box_name, touch_links=touch_links)
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/planning__scene__interface_8py_source.html
-
-	# 	# We wait for the planning scene to update.
-	# 	return self.wait_for_state_update(name,obj_is_known=False, obj_is_attached=True,  timeout=timeout)
-
-	# def detach_box(self,name, timeout=4):
-	# 	box_name = name
-	# 	scene = self._scene
-	# 	eef_link = self._eef_link
-
-	# 	scene.remove_attached_object(eef_link, name=box_name)
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/planning__scene__interface_8py_source.html
-
-	# 	return self.wait_for_state_update(name, box_is_known=True, box_is_attached=False, timeout=timeout)
-        
-	# def remove_box(self,name, timeout=4):
-	# 	box_name = name
-	# 	scene = self._scene
-	# 	scene.remove_world_object(box_name)
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
-	# 	#https://docs.ros.org/en/noetic/api/moveit_commander/html/planning__scene__interface_8py_source.html
-	# 	return self.wait_for_state_update(name, box_is_known=False, box_is_attached=False,  timeout=timeout)
 	
-
 	def gripper_action(self,gripper, action="open"):
 		'''
 		Function to execute the required action of the gripper.
@@ -178,6 +139,7 @@ class ArmRobot:
 			self.set_pose(gripper,"gripper_close")
 		else:
 			print("Action undefined") 
+
 	def set_pose(self,eef,arg_pose_name):
 		eef.set_named_target(arg_pose_name)
 		plan_success, plan, planning_time, error_code = eef.plan()
@@ -187,7 +149,7 @@ class ArmRobot:
 		self._execute_trajectory_client.wait_for_result()
 		rospy.loginfo('\033[32m' + "Now at: {}".format(arg_pose_name) + '\033[0m')
 		
-	def move_to_pose(self,arm, goal_pose):
+	def move_to_pose(self,arm, goal_pose, angles):
 		'''
 		Function to move the robot arm to the requested pose
 
@@ -207,7 +169,7 @@ class ArmRobot:
 		gripper_angle = geometry_msgs.msg.Quaternion()
 
 		#Orientation of the tcp(panda_hand_tcp) w.r.t base frame(panda_link0) 
-		quaternion = quaternion_from_euler(math.radians(180), 0, math.radians(-45))
+		quaternion = quaternion_from_euler(angles[0],angles[1],angles[2])
 
 		gripper_angle.x = quaternion[0]
 		gripper_angle.y = quaternion[1]
@@ -239,18 +201,22 @@ class ArmRobot:
 		rospy.sleep(1)
 
 		# 1) Move to pre-pick location
+		pre_pick_angle = [-1.5716,0.0, -0.1044]
+		#Sub 0.036 to x, add 0.004 to y and 0.170 to z for prepick
 		# Define pre-pick pose
 		pre_pick_pose = geometry_msgs.msg.Pose()
-		pre_pick_pose.position.x = pick_pose.position.x
-		pre_pick_pose.position.y = pick_pose.position.y
-		pre_pick_pose.position.z = pick_pose.position.z + 0.1 # Placing it above the object
+		pre_pick_pose.position.x = pick_pose.position.x - 0.036
+		pre_pick_pose.position.y = pick_pose.position.y + 0.004
+		pre_pick_pose.position.z = pick_pose.position.z + 0.2
+		
 		# Move
-		self.move_to_pose(arm, pre_pick_pose)
+		pick_angle = [-1.5716,0.7727, -0.1050] 
+		self.move_to_pose(arm, pre_pick_pose, pre_pick_angle)
 		# Sleep
 		rospy.sleep(1)
 
 		# 2) Move to pick location
-		self.move_to_pose(arm, pick_pose)
+		self.move_to_pose(arm, pick_pose,pick_angle)
 		# Sleep
 		rospy.sleep(1)
 
@@ -268,12 +234,10 @@ class ArmRobot:
 
 		# 4) Move to post-pick location
 		# Define post-pick pose
-		post_pick_pose = geometry_msgs.msg.Pose()
-		post_pick_pose.position.x = pick_pose.position.x
-		post_pick_pose.position.y = pick_pose.position.y
-		post_pick_pose.position.z = pick_pose.position.z + 0.1
+		post_pick_pose = pre_pick_pose
+		post_pick_angle = [-1.5716,-0.0008, -0.1044]
 		# Move
-		self.move_to_pose(arm, post_pick_pose)
+		self.move_to_pose(arm, post_pick_pose, post_pick_angle)
 		# Sleep
 		rospy.sleep(1)
 		return None        
@@ -329,42 +293,24 @@ def main():
 	robotArm = ArmRobot("arm_group", "gripper_group")
 	robotArm._scene.remove_world_object()
 	rospy.loginfo("-- Adding Objects --")
-	robotArm.create_object(obj_id="table1", ref_frame=robotArm._planning_frame,pose=[0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
-	robotArm.create_object(obj_id="table2", ref_frame=robotArm._planning_frame,pose=[-0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
-	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2,0,0.025,0.0,0.0,0.0],dims=[0.04,0.04,0.04])
+	# robotArm.create_object(obj_id="table1", ref_frame=robotArm._planning_frame,pose=[0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
+	# robotArm.create_object(obj_id="table2", ref_frame=robotArm._planning_frame,pose=[-0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
+	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2635,-0.0275,0.0300,0.0,0.0,0.0],dims=[0.04,0.04,0.04])
 	#robotArm.add_box("package$2",0.00,0.6318,0.015,0.03,0.03,0.03)
 	rospy.loginfo("Picking object 1")
 	pick_pose_1 = geometry_msgs.msg.Pose()
-	pick_pose_1.position.x = 0.5
-	pick_pose_1.position.y = -0.1
-	pick_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2.0)
+	pick_pose_1.position.x = 0.2635
+	pick_pose_1.position.y = -0.0275
+	pick_pose_1.position.z = 0.0300
+	# pick_pose_1=robotArm._scene.getObject("box1").primitive_poses[0]
+	# rospy.loginfo(fpick_pose_1.position.x, pick_pose_1.position.y, pick_pose_1.position.z)
 	robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group, pick_pose_1, box="box1")
 	# Place box1
-	place_pose_1 = geometry_msgs.msg.Pose()
-	place_pose_1.position.x = -0.15
-	place_pose_1.position.y = 0.5
-	place_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2)
-	robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, place_pose_1, box="box1")
-	# while not rospy.is_shutdown():
-	# 	task = input("Enter add to add object, attch to attach object, detach to detach object and remove to remove object: ")            
-	# 	if task == "attach":
-	# 		response = robotArm.attach_box("package$1")
-	# 		if response == True:
-	# 			rospy.loginfo('\033[32m' + "Attached Object in Rviz: {}".format(robotArm.box_name) + '\033[0m')
-	# 	if task == "detach":
-	# 		response = robotArm.detach_box("package$1")
-	# 		if response == True:
-	# 			rospy.loginfo('\033[32m' + "Detached Object from Rviz: {}".format(robotArm.box_name) + '\033[0m')
-	# 	if task == "remove":
-	# 		response = robotArm.remove_box("package$1")
-	# 		if response == True:
-	# 			rospy.loginfo('\033[32m' + "Removed Object from Rviz: {}".format(robotArm.box_name) + '\033[0m')
-	# 	if task == "x":
-	# 	    break
-	#rospy.spin()
-	# quit()
-	#delete the robotArm object at the end of code
-	# del robotArm
+	# place_pose_1 = geometry_msgs.msg.Pose()
+	# place_pose_1.position.x = -0.15
+	# place_pose_1.position.y = 0.5
+	# place_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2)
+	# robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, place_pose_1, box="box1")
 	robotArm._scene.remove_world_object()
     
 if __name__ == '__main__':
