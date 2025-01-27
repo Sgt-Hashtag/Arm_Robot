@@ -32,12 +32,12 @@
         <joint name="virtual_yaw_joint" value="0"/>
     </group_state>
     <group_state name="gripper_open" group="gripper_group">
-        <joint name="joint5" value="0.785"/>
-        <joint name="joint6" value="-0.785"/>
+        <joint name="joint5" value="1.309"/>
+        <joint name="joint6" value="-1.309"/>
     </group_state>
     <group_state name="gripper_close" group="gripper_group">
-        <joint name="joint5" value="0.3925"/>
-        <joint name="joint6" value="-0.3925"/>
+        <joint name="joint5" value="0.873"/>
+        <joint name="joint6" value="-0.873"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="gripper" parent_link="link4" group="gripper_group" parent_group="arm_group"/>

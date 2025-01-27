@@ -69,6 +69,6 @@ if __name__ == "__main__":
     kit.servo[1].angle = 135.0
     kit.servo[2].angle = 179.9
     kit.servo[3].angle = 135.0
-    kit.servo[4].angle = 22.5    
-    kit.servo[5].angle = 157.5
+    kit.servo[4].angle = 50    
+    kit.servo[5].angle = 130
     listener()

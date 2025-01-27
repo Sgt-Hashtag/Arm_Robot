@@ -246,17 +246,19 @@ class ArmRobot:
 	def place_action(self, scene, arm, gripper, place_pose, box):
 		# 1) Move to pre-drop location
 		# Define pre-drop pose
-		pre_drop_pose = geometry_msgs.msg.Pose()
-		pre_drop_pose.position.x = place_pose.position.x
-		pre_drop_pose.position.y = place_pose.position.y
-		pre_drop_pose.position.z = place_pose.position.z + 0.001
+		pre_place_angle = [-1.5611, 0.0784,3.0379]
+		pre_place_pose = geometry_msgs.msg.Pose()
+		pre_place_pose.position.x = place_pose.position.x - 0.0363
+		pre_place_pose.position.y = place_pose.position.y + 0.0044
+		pre_place_pose.position.z = place_pose.position.z + 0.2
 		# Move
-		self.move_to_pose(arm, pre_drop_pose)
+		self.move_to_pose(arm, pre_place_pose, pre_place_angle)
 		# Sleep
 		rospy.sleep(1)
 
 		# 2) Move to drop location
-		self.move_to_pose(arm, place_pose)
+		place_angle = [-1.5716,0.7727, -0.1050]
+		self.move_to_pose(arm, place_pose,place_angle)
 		# Sleep
 		rospy.sleep(1)
 
@@ -271,12 +273,23 @@ class ArmRobot:
 
 		# 4) Move to post-drop location
 		# Define post-drop pose
+		post_place_angle=pre_place_angle
+		post_place_angle=[-1.5611, 0.0784,3.038]
 		post_drop_pose = geometry_msgs.msg.Pose()
-		post_drop_pose.position.x = place_pose.position.x
-		post_drop_pose.position.y = place_pose.position.y
-		post_drop_pose.position.z = place_pose.position.z + 0.1
+		post_drop_pose.position.x = place_pose.position.x - 0.0363
+		post_drop_pose.position.y = place_pose.position.y + 0.0044
+		post_drop_pose.position.z = place_pose.position.z + 0.2
 		# Move
-		self.move_to_pose(arm, post_drop_pose)
+		self.move_to_pose(arm, post_drop_pose,post_place_angle)
+		
+		# #INTERMEDIATE
+		target_pose = geometry_msgs.msg.Pose()
+		target_pose.position.x = 0.0248  # Example x position 
+		target_pose.position.y = 0.2273  # Example y position
+		target_pose.position.z = 0.2330  # Example z position 
+		target_angle=[-1.5710, -0.0002, 1.4621]
+		self.move_to_pose(arm, target_pose,target_angle)
+		self.gripper_action(gripper, action="close")
 		# Sleep
 		rospy.sleep(1)
 		return None
@@ -293,6 +306,7 @@ def main():
 	robotArm = ArmRobot("arm_group", "gripper_group")
 	robotArm._scene.remove_world_object()
 	rospy.loginfo("-- Adding Objects --")
+	robotArm.create_object(obj_id="ceiling", ref_frame=robotArm._planning_frame,pose=[0.0,0,0.30,0.0,0.0,0.0],dims=[0.4,0.4,0.01])
 	# robotArm.create_object(obj_id="table1", ref_frame=robotArm._planning_frame,pose=[0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
 	# robotArm.create_object(obj_id="table2", ref_frame=robotArm._planning_frame,pose=[-0.2,0,-0.01,0.0,0.0,0.0],dims=[0.2,0.5,0.01])
 	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2635,-0.0275,0.0300,0.0,0.0,0.0],dims=[0.04,0.04,0.04])
@@ -306,11 +320,13 @@ def main():
 	# rospy.loginfo(fpick_pose_1.position.x, pick_pose_1.position.y, pick_pose_1.position.z)
 	robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group, pick_pose_1, box="box1")
 	# Place box1
-	# place_pose_1 = geometry_msgs.msg.Pose()
-	# place_pose_1.position.x = -0.15
-	# place_pose_1.position.y = 0.5
-	# place_pose_1.position.z = 0.3+((0.01+0.025+0.02)/2)
-	# robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, place_pose_1, box="box1")
+	rospy.loginfo("Placing object 1")
+	place_pose_1 = geometry_msgs.msg.Pose()
+	place_pose_1.position.x = -0.2635
+	place_pose_1.position.y = 0.0275
+	place_pose_1.position.z = 0.0300
+	robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, place_pose_1, box="box1")
+	robotArm.set_pose(robotArm._group,"arm_home")
 	robotArm._scene.remove_world_object()
     
 if __name__ == '__main__':
