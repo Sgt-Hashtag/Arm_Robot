@@ -43,7 +43,7 @@ class ArmRobot:
 		self._group_names = self._robot.get_group_names()
 		self._group.set_goal_position_tolerance(1E-2)
 		self._group.set_goal_orientation_tolerance(1E-3)
-		self._group.set_planning_time(10) #setting planning time in seconds
+		self._group.set_planning_time(15) #setting planning time in seconds
 	
 		self._execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', ExecuteTrajectoryAction)
 		self._execute_trajectory_client.wait_for_server()
@@ -235,7 +235,7 @@ class ArmRobot:
 		# 4) Move to post-pick location
 		# Define post-pick pose
 		post_pick_pose = pre_pick_pose
-		post_pick_angle = [-1.5716,-0.0008, -0.1044]
+		post_pick_angle = pre_pick_angle
 		# Move
 		self.move_to_pose(arm, post_pick_pose, post_pick_angle)
 		# Sleep
@@ -244,12 +244,21 @@ class ArmRobot:
 	
 	# Object Place function
 	def place_action(self, scene, arm, gripper, place_pose, box):
+
+		# #INTERMEDIATE
+		target_pose = geometry_msgs.msg.Pose()
+		target_pose.position.x = 0.0248  # Example x position 
+		target_pose.position.y = 0.2273  # Example y position
+		target_pose.position.z = 0.2330  # Example z position 
+		target_angle=[-1.5710, -0.0002, 1.4621]
+		self.move_to_pose(arm, target_pose,target_angle)
+		
 		# 1) Move to pre-drop location
 		# Define pre-drop pose
 		pre_place_angle = [-1.5611, 0.0784,3.0379]
 		pre_place_pose = geometry_msgs.msg.Pose()
-		pre_place_pose.position.x = place_pose.position.x - 0.0363
-		pre_place_pose.position.y = place_pose.position.y + 0.0044
+		pre_place_pose.position.x = place_pose.position.x + 0.0363
+		pre_place_pose.position.y = place_pose.position.y - 0.0044
 		pre_place_pose.position.z = place_pose.position.z + 0.2
 		# Move
 		self.move_to_pose(arm, pre_place_pose, pre_place_angle)
@@ -273,14 +282,10 @@ class ArmRobot:
 
 		# 4) Move to post-drop location
 		# Define post-drop pose
+		post_place_pose=pre_place_pose
 		post_place_angle=pre_place_angle
-		post_place_angle=[-1.5611, 0.0784,3.038]
-		post_drop_pose = geometry_msgs.msg.Pose()
-		post_drop_pose.position.x = place_pose.position.x - 0.0363
-		post_drop_pose.position.y = place_pose.position.y + 0.0044
-		post_drop_pose.position.z = place_pose.position.z + 0.2
 		# Move
-		self.move_to_pose(arm, post_drop_pose,post_place_angle)
+		self.move_to_pose(arm, post_place_pose,post_place_angle)
 		
 		# #INTERMEDIATE
 		target_pose = geometry_msgs.msg.Pose()
