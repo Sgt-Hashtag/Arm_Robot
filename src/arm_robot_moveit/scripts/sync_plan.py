@@ -65,9 +65,9 @@ if __name__ == "__main__":
     kit.servo[6].actuation_range = 180
     kit.servo[6].set_pulse_width_range(600, 2600)
    
-    kit.servo[0].angle = 0
+    kit.servo[0].angle = 90.0
     kit.servo[1].angle = 135.0
-    kit.servo[2].angle = 179.9
+    kit.servo[2].angle = 180.0
     kit.servo[3].angle = 135.0
     kit.servo[4].angle = 50    
     kit.servo[5].angle = 130
