@@ -239,7 +239,7 @@ def main():
 	#robotArm.add_box("package$2",0.00,0.6318,0.015,0.03,0.03,0.03)
 	rospy.loginfo("Picking object 1")
 	robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group,box="box1")
-	robotArm.set_pose(robotArm._group,"arm_home")
+	# robotArm.set_pose(robotArm._group,"arm_home")
 	# Place box1
 	rospy.loginfo("Placing object 1")
 	robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, box="box1")
