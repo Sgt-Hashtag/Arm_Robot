@@ -220,6 +220,79 @@ class ArmRobot:
 		rospy.sleep(0.5)
 		return None
 
+	#==================================================================
+	def pick_action_reverse(self,scene, robot, arm, gripper,box):
+		# Gripper open
+		self.gripper_action(gripper, action="open")
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 1) Move to pre-pick location
+		self.set_pose(arm,"pre_place_pose")
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 2) Move to pick location
+		self.set_pose(arm,"place_pose")
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 3) Close the gripper and attach the object
+		# Close gripper
+		self.gripper_action(gripper, action="close")
+		# Attaching the object
+		eef_frame = arm.get_end_effector_link()
+		grasping_group = self._grasping_group
+		touch_links= robot.get_link_names(group=grasping_group)
+		scene.attach_box(eef_frame, box, touch_links=touch_links)
+		
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 4) Move to post-pick location
+		# Define post-pick pose
+		post_pick_pose = "pre_place_pose"
+		# Move
+		self.set_pose(arm, post_pick_pose)
+		# Sleep
+		rospy.sleep(0.5)
+		return None        
+	
+	# Object Place function
+	def place_action_reverse(self, scene, arm, gripper, box):
+		
+		# 1) Move to pre-drop location
+		# Move
+		pre_place_pose = "pre_pick_pose_1"
+		self.set_pose(arm, pre_place_pose)
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 2) Move to drop location
+		place_pose = "pick_pose_1"
+		self.set_pose(arm, place_pose)
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 3) Open the gripper and detach the object
+		# Open gripper
+		self.gripper_action(gripper, action="open")
+		# Detaching the object
+		eef_frame = arm.get_end_effector_link()
+		scene.remove_attached_object(eef_frame, name=box)
+		# Sleep
+		rospy.sleep(0.5)
+
+		# 4) Move to post-drop location
+		# Define post-drop pose
+		post_place_pose="pre_pick_pose_1"
+		# Move
+		self.set_pose(arm, post_place_pose)
+		# Sleep
+		rospy.sleep(0.5)
+		return None
+	#==================================================================
+
 	# Destructor
 	def __del__(self):
 		moveit_commander.roscpp_shutdown()
@@ -238,11 +311,25 @@ def main():
 	robotArm.create_object(obj_id="box1", ref_frame=robotArm._planning_frame,pose=[0.2635,-0.0275,0.0300,0.0,0.0,0.0],dims=[0.04,0.04,0.04])
 	#robotArm.add_box("package$2",0.00,0.6318,0.015,0.03,0.03,0.03)
 	rospy.loginfo("Picking object 1")
-	robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group,box="box1")
-	robotArm.set_pose(robotArm._group,"arm_home")
+
+	#robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group,box="box1")
+	# robotArm.set_pose(robotArm._group,"arm_home")
 	# Place box1
-	rospy.loginfo("Placing object 1")
-	robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, box="box1")
+	#rospy.loginfo("Placing object 1")
+	#robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, box="box1")
+
+	#==================================================================
+	for i in range(5):
+		robotArm.pick_action(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group,box="box1")
+		rospy.loginfo("Placing object 1")
+		robotArm.place_action(robotArm._scene, robotArm._group, robotArm._eef_group, box="box1")
+
+		robotArm.pick_action_reverse(robotArm._scene, robotArm._robot, robotArm._group, robotArm._eef_group,box="box1")
+		rospy.loginfo("Placing object 1")
+		robotArm.place_action_reverse(robotArm._scene, robotArm._group, robotArm._eef_group, box="box1")
+
+	#==================================================================
+
 	robotArm.set_pose(robotArm._group,"arm_home")
 	robotArm.set_pose(robotArm._eef_group,"gripper_close")
 	robotArm._scene.remove_world_object()
