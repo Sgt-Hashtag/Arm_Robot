@@ -7,9 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
 )
-
-add_service_files(DIRECTORY srv)
-
 catkin_package(
 	INCLUDE_DIRS
 	CATKIN_DEPENDS
