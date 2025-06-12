@@ -1,6 +1,42 @@
 arm_group_controller:
-  type: "position_controllers/JointTrajectoryController"
-  joints: [joint1, joint2, joint3, joint4, virtual_roll_joint, virtual_yaw_joint]
+  type: "effort_controllers/JointTrajectoryController"
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - virtual_roll_joint
+    - virtual_yaw_joint
+
+  constraints:
+    goal_time: 0.5                   # Override default
+    stopped_velocity_tolerance: 0.02 # Override default
+    joint1:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+    joint2:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+    joint3:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+    joint4:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+    virtual_roll_joint:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+    virtual_yaw_joint:
+      trajectory: 0.05               # Not enforced if unspecified
+      goal: 0.02                     # Not enforced if unspecified
+
+  gains: # Required because we're controlling an effort interface
+    joint1: {p: 50,  d: 0.01, i: 0, i_clamp: 1}
+    joint2: {p: 100,  d: 0.01, i: 0, i_clamp: 1}
+    joint3: {p: 100,  d: 0.01, i: 0, i_clamp: 1}
+    joint4: {p: 100,  d: 0.01, i: 0, i_clamp: 1}
+    virtual_roll_joint: {p: 100,  d: 0.01, i: 0, i_clamp: 1}
+    virtual_yaw_joint: {p: 100,  d: 0.01, i: 0, i_clamp: 1}
 
 gripper_group_controller:
   type: "position_controllers/JointTrajectoryController"
