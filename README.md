@@ -4,3 +4,4 @@
 - Dont use the IkFast plugin it is not well formed.
 
 # Please Check the wiki page for detailed instruction
+![IMG-20250129-WA0003(1)](https://github.com/user-attachments/assets/c0757308-7b06-41fa-96b5-60461ccb4823)
