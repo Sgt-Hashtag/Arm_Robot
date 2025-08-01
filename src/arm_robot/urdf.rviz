@@ -68,10 +68,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        gripper_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         link1:
           Alpha: 1
           Show Axes: false
@@ -120,8 +116,6 @@ Visualization Manager:
       Frames:
         All Enabled: false
         base_link:
-          Value: false
-        gripper_center:
           Value: true
         link1:
           Value: false
@@ -130,13 +124,13 @@ Visualization Manager:
         link3:
           Value: false
         link4:
-          Value: true
+          Value: false
         link5:
           Value: false
         link6:
           Value: false
         world:
-          Value: false
+          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -150,8 +144,6 @@ Visualization Manager:
               link2:
                 link3:
                   link4:
-                    gripper_center:
-                      {}
                     link5:
                       {}
                     link6:
@@ -186,7 +178,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.445334255695343
+      Distance: 10
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -194,38 +186,18 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.2058536857366562
-        Y: 0.0014365644892677665
-        Z: 0.34997329115867615
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.36039838194847107
+      Pitch: 0.785398006439209
       Target Frame: <Fixed Frame>
-      Yaw: 3.0803983211517334
-    Saved:
-      - Class: rviz/Orbit
-        Distance: 0.445334255695343
-        Enable Stereo Rendering:
-          Stereo Eye Separation: 0.05999999865889549
-          Stereo Focal Distance: 1
-          Swap Stereo Eyes: false
-          Value: false
-        Field of View: 0.7853981852531433
-        Focal Point:
-          X: 0.2058536857366562
-          Y: 0.0014365644892677665
-          Z: 0.34997329115867615
-        Focal Shape Fixed Size: true
-        Focal Shape Size: 0.05000000074505806
-        Invert Z Axis: false
-        Name: Orbit
-        Near Clip Distance: 0.009999999776482582
-        Pitch: 0.36039838194847107
-        Target Frame: <Fixed Frame>
-        Yaw: 3.0803983211517334
+      Yaw: 0.785398006439209
+    Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
@@ -243,4 +215,4 @@ Window Geometry:
     collapsed: false
   Width: 1200
   X: 60
-  Y: 27
+  Y: 23

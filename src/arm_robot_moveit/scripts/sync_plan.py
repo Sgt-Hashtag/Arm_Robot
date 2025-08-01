@@ -19,11 +19,11 @@ def callback(data):
         if radians_to_angles>180:
             radians_to_angles = 180
         if index==1:
-            radians_to_angles = 90 - radians_to_angles     
+            radians_to_angles = 90 + radians_to_angles     
         if index>1 and index<4 :
-            radians_to_angles = 90 + radians_to_angles
-        if index==5:
-            radians_to_angles = 180 + radians_to_angles  
+            radians_to_angles = 180 + radians_to_angles
+        if index==4:
+            radians_to_angles = 180 - radians_to_angles  
         
         data_list.append(round(radians_to_angles,1))
         
@@ -34,7 +34,6 @@ def callback(data):
     kit.servo[2].angle = data_list[2]
     kit.servo[3].angle = data_list[3]
     kit.servo[4].angle = data_list[4]
-    kit.servo[5].angle = data_list[5]
 
 
 def listener():
@@ -60,15 +59,10 @@ if __name__ == "__main__":
     kit.servo[3].set_pulse_width_range(600, 2600)
     kit.servo[4].actuation_range = 180
     kit.servo[4].set_pulse_width_range(600, 2600)
-    kit.servo[5].actuation_range = 180
-    kit.servo[5].set_pulse_width_range(600, 2600)
-    kit.servo[6].actuation_range = 180
-    kit.servo[6].set_pulse_width_range(600, 2600)
    
     kit.servo[0].angle = 90.0
     kit.servo[1].angle = 135.0
     kit.servo[2].angle = 180.0
     kit.servo[3].angle = 135.0
     kit.servo[4].angle = 15.0 
-    kit.servo[5].angle = 165.0
     listener()
